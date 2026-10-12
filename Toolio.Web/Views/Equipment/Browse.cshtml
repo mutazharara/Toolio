@@ -1,0 +1,343 @@
+@model Toolio.Web.ViewModels.EquipmentBrowseViewModel
+
+@{
+    ViewData["Title"] = "Browse Equipment";
+}
+
+<div class="container py-5">
+
+    <!-- Heading -->
+    <div class="mb-5">
+
+        <h1 class="display-5 fw-bold">
+            Find the right tool for the job
+        </h1>
+
+        <p class="text-muted fs-5">
+            Rent equipment from people in your community.
+        </p>
+
+    </div>
+
+
+    <!-- Search and filters -->
+    <form method="get"
+          asp-action="Browse"
+          class="border rounded-4 p-4 mb-5 bg-white">
+
+        <div class="row g-3">
+
+            <!-- Search -->
+            <div class="col-lg-5">
+
+                <label class="form-label">
+                    What do you need?
+                </label>
+
+                <input type="text"
+                       name="search"
+                       value="@Model.SearchTerm"
+                       class="form-control form-control-lg"
+                       placeholder="Drill, ladder, lawn mower..." />
+
+            </div>
+
+
+            <!-- Category -->
+            <div class="col-lg-3">
+
+                <label class="form-label">
+                    Category
+                </label>
+
+                <select name="categoryId"
+                        class="form-select form-select-lg">
+
+                    <option value="">
+                        All categories
+                    </option>
+
+                    @foreach (var category in Model.Categories)
+                    {
+                        if (Model.CategoryId == category.CategoryId)
+                        {
+                            <option value="@category.CategoryId"
+                                    selected>
+                                @category.Name
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@category.CategoryId">
+                                @category.Name
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- Availability -->
+            <div class="col-lg-2">
+
+                <label class="form-label">
+                    Availability
+                </label>
+
+                <select name="availability"
+                        class="form-select form-select-lg">
+
+                    @if (Model.Availability == "available")
+                    {
+                        <option value="available" selected>
+                            Available
+                        </option>
+
+                        <option value="all">
+                            All
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="available">
+                            Available
+                        </option>
+
+                        <option value="all" selected>
+                            All
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- Search button -->
+            <div class="col-lg-2 d-flex align-items-end">
+
+                <button type="submit"
+                        class="btn btn-dark btn-lg w-100">
+                    Search
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Sorting -->
+        <div class="row mt-3">
+
+            <div class="col-md-3">
+
+                <label class="form-label">
+                    Sort by
+                </label>
+
+                <select name="sort"
+                        class="form-select"
+                        onchange="this.form.submit()">
+
+                    <option value="newest"
+                            selected="@(Model.Sort == "newest")">
+                        Newest
+                    </option>
+
+                    <option value="price-low"
+                            selected="@(Model.Sort == "price-low")">
+                        Price: Low to High
+                    </option>
+
+                    <option value="price-high"
+                            selected="@(Model.Sort == "price-high")">
+                        Price: High to Low
+                    </option>
+
+                    <option value="name"
+                            selected="@(Model.Sort == "name")">
+                        Name
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </form>
+
+
+    <!-- Results information -->
+    <div class="d-flex justify-content-between
+                align-items-center mb-4">
+
+        <div>
+
+            <h2 class="h4 mb-1">
+                Available equipment
+            </h2>
+
+            <p class="text-muted mb-0">
+                @Model.Equipment.Count item(s) found
+            </p>
+
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.SearchTerm)
+             || Model.CategoryId.HasValue)
+        {
+            <a asp-action="Browse"
+               class="btn btn-outline-secondary">
+                Clear filters
+            </a>
+        }
+
+    </div>
+
+
+    <!-- No results -->
+    @if (!Model.Equipment.Any())
+    {
+        <div class="border rounded-4
+                    text-center p-5">
+
+            <h3 class="h5">
+                No equipment found
+            </h3>
+
+            <p class="text-muted">
+                Try changing your search or filters.
+            </p>
+
+            <a asp-action="Browse"
+               class="btn btn-dark">
+                View all equipment
+            </a>
+
+        </div>
+    }
+    else
+    {
+        <!-- Equipment Cards -->
+        <div class="row g-4">
+
+            @foreach (var item in Model.Equipment)
+            {
+                <div class="col-sm-6 col-lg-4">
+
+                    <div class="card border-0 h-100">
+
+                        <!-- Equipment image -->
+                        <a asp-action="Details"
+                           asp-route-id="@item.EquipmentId"
+                           class="text-decoration-none">
+
+                            @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl"
+                                     alt="@item.Name"
+                                     class="w-100 rounded-4"
+                                     style="
+                                         aspect-ratio:4/3;
+                                         object-fit:cover;
+                                     " />
+                            }
+                            else
+                            {
+                                <div class="
+                                    bg-light
+                                    rounded-4
+                                    d-flex
+                                    align-items-center
+                                    justify-content-center
+                                    text-muted"
+                                     style="
+                                         aspect-ratio:4/3;
+                                     ">
+
+                                    Equipment photo
+
+                                </div>
+                            }
+
+                        </a>
+
+
+                        <!-- Equipment details -->
+                        <div class="pt-3">
+
+                            <div class="
+                                d-flex
+                                justify-content-between
+                                gap-3">
+
+                                <a asp-action="Details"
+                                   asp-route-id="@item.EquipmentId"
+                                   class="
+                                       text-decoration-none
+                                       text-dark">
+
+                                    <h3 class="h5 mb-1">
+                                        @item.Name
+                                    </h3>
+
+                                </a>
+
+                                @if (item.IsAvailable)
+                                {
+                                    <span class="
+                                        badge
+                                        text-bg-success
+                                        align-self-start">
+
+                                        Available
+
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <p class="text-muted mb-2">
+                                @item.Category?.Name
+                            </p>
+
+
+                            <p class="mb-3">
+
+                                <strong class="fs-5">
+                                    @item.PricePerDay.ToString("C")
+                                </strong>
+
+                                <span class="text-muted">
+                                    / day
+                                </span>
+
+                            </p>
+
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.EquipmentId"
+                               class="
+                                   btn
+                                   btn-outline-dark
+                                   w-100">
+
+                                View details
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

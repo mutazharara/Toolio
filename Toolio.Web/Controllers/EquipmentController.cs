@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Toolio.Web.Data;
 using Toolio.Web.Models;
+using Toolio.Web.ViewModels;
 
 namespace Toolio.Web.Controllers;
 
@@ -17,6 +18,101 @@ public class EquipmentController : Controller
     {
         _context = context;
     }
+
+    // GET: /Equipment/Browse
+    [AllowAnonymous]
+    public async Task<IActionResult> Browse(
+        string? search,
+        int? categoryId,
+        string availability = "available",
+        string sort = "newest")
+    {
+        var query = _context.Equipment
+            .Include(e => e.Category)
+            .AsNoTracking()
+            .AsQueryable();
+
+        // Search
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            string searchTerm = search.Trim();
+
+            query = query.Where(e =>
+                e.Name.Contains(searchTerm) ||
+                e.Description.Contains(searchTerm) ||
+                (e.Category != null &&
+                e.Category.Name.Contains(searchTerm)));
+        }
+
+        // Category filter
+        if (categoryId.HasValue)
+        {
+            query = query.Where(e =>
+                e.CategoryId == categoryId.Value);
+        }
+
+        // Availability filter
+        if (availability != "all")
+        {
+            query = query.Where(e =>
+                e.IsAvailable);
+        }
+
+        // Sorting
+        query = sort switch
+        {
+            "price-low" =>
+                query.OrderBy(e => e.PricePerDay),
+
+            "price-high" =>
+                query.OrderByDescending(e => e.PricePerDay),
+
+            "name" =>
+                query.OrderBy(e => e.Name),
+
+            _ =>
+                query.OrderByDescending(e => e.CreatedAt)
+        };
+
+        var model = new EquipmentBrowseViewModel
+        {
+            Equipment = await query.ToListAsync(),
+
+            Categories = await _context.Categories
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .ToListAsync(),
+
+            SearchTerm = search,
+
+            CategoryId = categoryId,
+
+            Availability = availability,
+
+            Sort = sort
+        };
+
+        return View(model);
+    }
+
+    // GET: /Equipment/Details/5
+    [AllowAnonymous]
+    public async Task<IActionResult> Details(int id)
+    {
+        var equipment = await _context.Equipment
+            .Include(e => e.Category)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e =>
+                e.EquipmentId == id);
+
+        if (equipment == null)
+        {
+            return NotFound();
+        }
+
+        return View(equipment);
+    }
+
 
     // GET: /Equipment
     // Shows only equipment owned by the logged-in user
