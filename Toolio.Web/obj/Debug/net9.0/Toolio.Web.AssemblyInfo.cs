@@ -10,10 +10,12 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute("Bootstrap5")]
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("aspnet-Toolio.Web-d2eed2b2-d98e-47f9-a970-7e7ef5225963")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Toolio.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4159cc531848464e0cc6fad8b1dded4cb7e166d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("Toolio.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Toolio.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
