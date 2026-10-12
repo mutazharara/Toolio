@@ -2,7 +2,6 @@
 /Users/mutaz/Documents/GitHub/Toolio/Toolio.Web/bin/Debug/net9.0/appsettings.json
 /Users/mutaz/Documents/GitHub/Toolio/Toolio.Web/bin/Debug/net9.0/Toolio.Web.staticwebassets.runtime.json
 /Users/mutaz/Documents/GitHub/Toolio/Toolio.Web/bin/Debug/net9.0/Toolio.Web.staticwebassets.endpoints.json
-/Users/mutaz/Documents/GitHub/Toolio/Toolio.Web/bin/Debug/net9.0/app.db
 /Users/mutaz/Documents/GitHub/Toolio/Toolio.Web/bin/Debug/net9.0/Toolio.Web
 /Users/mutaz/Documents/GitHub/Toolio/Toolio.Web/bin/Debug/net9.0/Toolio.Web.deps.json
 /Users/mutaz/Documents/GitHub/Toolio/Toolio.Web/bin/Debug/net9.0/Toolio.Web.runtimeconfig.json
