@@ -1,0 +1,158 @@
+@model Toolio.Web.Models.Equipment
+
+@{
+    ViewData["Title"] = "List Equipment";
+}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <h1>List your equipment</h1>
+
+            <p class="text-muted mb-4">
+                Add equipment that other Toolio users can rent.
+            </p>
+
+            <form asp-action="Create"
+                  method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Name"
+                           class="form-label">
+                        Equipment name
+                    </label>
+
+                    <input asp-for="Name"
+                           class="form-control"
+                           placeholder="e.g. Bosch 18V Cordless Drill" />
+
+                    <span asp-validation-for="Name"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Description"
+                           class="form-label">
+                    </label>
+
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="5"
+                              placeholder="Describe the equipment, its condition and what is included.">
+                    </textarea>
+
+                    <span asp-validation-for="Description"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="CategoryId"
+                           class="form-label">
+                        Category
+                    </label>
+
+                    <select asp-for="CategoryId"
+                            asp-items="ViewBag.CategoryId"
+                            class="form-select">
+
+                        <option value="">
+                            Select a category
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="CategoryId"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="PricePerDay"
+                           class="form-label">
+                        Price per day
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            $
+                        </span>
+
+                        <input asp-for="PricePerDay"
+                               class="form-control"
+                               placeholder="15.00" />
+
+                    </div>
+
+                    <span asp-validation-for="PricePerDay"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="ImageUrl"
+                           class="form-label">
+                        Image URL
+                    </label>
+
+                    <input asp-for="ImageUrl"
+                           class="form-control"
+                           placeholder="https://..." />
+
+                    <small class="text-muted">
+                        We will replace this with real image uploading later.
+                    </small>
+
+                </div>
+
+                <div class="form-check mb-4">
+
+                    <input asp-for="IsAvailable"
+                           class="form-check-input" />
+
+                    <label asp-for="IsAvailable"
+                           class="form-check-label">
+                        Available for rent
+                    </label>
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-dark">
+                    Publish Listing
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
