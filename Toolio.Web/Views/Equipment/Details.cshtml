@@ -3,6 +3,12 @@
 @{
     ViewData["Title"] = Model.Name;
 }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-4">
+        @TempData["Error"]
+    </div>
+}
 
 <div class="container py-5">
 
@@ -135,16 +141,27 @@
                     </div>
 
 
-                    <button class="
-                        btn
-                        btn-dark
-                        btn-lg
-                        w-100"
-                            disabled>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-controller="Bookings"
+                        asp-action="Create"
+                        asp-route-equipmentId="@Model.EquipmentId"
+                        class="btn btn-dark btn-lg w-100">
 
-                        Request booking
+                            Request booking
 
-                    </button>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-area="Identity"
+                        asp-page="/Account/Login"
+                        class="btn btn-dark btn-lg w-100">
+
+                            Log in to request booking
+
+                        </a>
+                    }
 
                     <p class="
                         text-muted

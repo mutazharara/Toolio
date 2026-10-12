@@ -1,0 +1,129 @@
+@model Toolio.Web.ViewModels.BookingCreateViewModel
+
+@{
+    ViewData["Title"] = "Request Booking";
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <a asp-controller="Equipment"
+               asp-action="Details"
+               asp-route-id="@Model.EquipmentId"
+               class="text-decoration-none text-dark">
+
+                ← Back to equipment
+
+            </a>
+
+
+            <div class="mt-4 mb-4">
+
+                <h1>
+                    Request booking
+                </h1>
+
+                <p class="text-muted">
+                    @Model.EquipmentName
+                </p>
+
+            </div>
+
+
+            <div class="border rounded-4 p-4">
+
+                <form asp-action="Create"
+                      method="post">
+
+                    <input type="hidden"
+                           asp-for="EquipmentId" />
+
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="alert alert-danger">
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <p class="mb-1 text-muted">
+                            Rental price
+                        </p>
+
+                        <strong class="fs-4">
+                            @Model.PricePerDay.ToString("C")
+                        </strong>
+
+                        <span class="text-muted">
+                            / day
+                        </span>
+
+                    </div>
+
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="StartDate"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="StartDate"
+                                   class="form-control" />
+
+                            <span asp-validation-for="StartDate"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="EndDate"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="EndDate"
+                                   class="form-control" />
+
+                            <span asp-validation-for="EndDate"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="text-muted small">
+                        Your final rental price will be
+                        calculated based on the number
+                        of rental days.
+                    </p>
+
+
+                    <button type="submit"
+                            class="btn btn-dark btn-lg w-100">
+
+                        Send booking request
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

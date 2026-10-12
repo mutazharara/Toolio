@@ -224,6 +224,43 @@ namespace Toolio.Web.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Toolio.Web.Models.Booking", b =>
+                {
+                    b.Property<int>("BookingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RenterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("BookingId");
+
+                    b.HasIndex("EquipmentId");
+
+                    b.ToTable("Bookings");
+                });
+
             modelBuilder.Entity("Toolio.Web.Models.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -341,6 +378,17 @@ namespace Toolio.Web.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Toolio.Web.Models.Booking", b =>
+                {
+                    b.HasOne("Toolio.Web.Models.Equipment", "Equipment")
+                        .WithMany("Bookings")
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Equipment");
+                });
+
             modelBuilder.Entity("Toolio.Web.Models.Equipment", b =>
                 {
                     b.HasOne("Toolio.Web.Models.Category", "Category")
@@ -355,6 +403,11 @@ namespace Toolio.Web.Migrations
             modelBuilder.Entity("Toolio.Web.Models.Category", b =>
                 {
                     b.Navigation("Equipment");
+                });
+
+            modelBuilder.Entity("Toolio.Web.Models.Equipment", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

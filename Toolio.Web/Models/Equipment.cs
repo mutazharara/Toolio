@@ -34,4 +34,7 @@ public class Equipment
     public string OwnerId { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public ICollection<Booking> Bookings { get; set; }
+    = new List<Booking>();
 }

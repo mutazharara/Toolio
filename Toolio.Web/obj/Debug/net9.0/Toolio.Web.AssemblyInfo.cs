@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Toolio.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1780663e035f0e44ba9667c2123a2a01aefa96b0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c6af1a0c4c616fd17b6f335f8c45135ff5220e2e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Toolio.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Toolio.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

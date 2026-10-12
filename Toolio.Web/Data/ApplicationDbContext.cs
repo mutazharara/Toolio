@@ -14,4 +14,6 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Category> Categories { get; set; }
 
     public DbSet<Equipment> Equipment { get; set; }
+
+    public DbSet<Booking> Bookings { get; set; }
 }

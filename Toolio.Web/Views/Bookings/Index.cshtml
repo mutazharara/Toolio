@@ -1,0 +1,151 @@
+@model IEnumerable<Toolio.Web.Models.Booking>
+
+@{
+    ViewData["Title"] = "My Rentals";
+}
+
+<div class="container py-5">
+
+    <div class="mb-4">
+
+        <h1>My Rentals</h1>
+
+        <p class="text-muted">
+            View and manage your Toolio rental requests.
+        </p>
+
+    </div>
+
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+
+    @if (!Model.Any())
+    {
+        <div class="
+            border
+            rounded-4
+            p-5
+            text-center">
+
+            <h3>
+                No rentals yet
+            </h3>
+
+            <p class="text-muted">
+                Browse Toolio to find equipment
+                available in your community.
+            </p>
+
+            <a asp-controller="Equipment"
+               asp-action="Browse"
+               class="btn btn-dark">
+
+                Browse equipment
+
+            </a>
+
+        </div>
+    }
+    else
+    {
+        @foreach (var booking in Model)
+        {
+            <div class="
+                border
+                rounded-4
+                p-4
+                mb-3">
+
+                <div class="
+                    d-flex
+                    justify-content-between
+                    flex-wrap
+                    gap-3">
+
+                    <div>
+
+                        <h3 class="h5">
+                            @booking.Equipment?.Name
+                        </h3>
+
+                        <p class="text-muted mb-1">
+
+                            @booking.StartDate.ToString("dd MMM yyyy")
+
+                            →
+
+                            @booking.EndDate.ToString("dd MMM yyyy")
+
+                        </p>
+
+                        <strong>
+                            @booking.TotalPrice.ToString("C")
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        @switch (booking.Status)
+                        {
+                            case Toolio.Web.Models.BookingStatus.Pending:
+
+                                <span class="badge text-bg-warning">
+                                    Pending
+                                </span>
+
+                                break;
+
+
+                            case Toolio.Web.Models.BookingStatus.Approved:
+
+                                <span class="badge text-bg-success">
+                                    Approved
+                                </span>
+
+                                break;
+
+
+                            case Toolio.Web.Models.BookingStatus.Rejected:
+
+                                <span class="badge text-bg-danger">
+                                    Rejected
+                                </span>
+
+                                break;
+
+
+                            case Toolio.Web.Models.BookingStatus.Completed:
+
+                                <span class="badge text-bg-primary">
+                                    Completed
+                                </span>
+
+                                break;
+
+
+                            default:
+
+                                <span class="badge text-bg-secondary">
+                                    @booking.Status
+                                </span>
+
+                                break;
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+    }
+
+</div>
