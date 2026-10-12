@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Toolio.Web/1.0.0": {
+        "runtime": {
+          "Toolio.Web.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Toolio.Web/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
