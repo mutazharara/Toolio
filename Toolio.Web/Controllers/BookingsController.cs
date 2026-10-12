@@ -42,6 +42,170 @@ public class BookingsController : Controller
         return View(bookings);
     }
 
+    // POST: /Bookings/Approve/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Approve(int id)
+    {
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+        if (userId == null)
+        {
+            return Challenge();
+        }
+
+        var booking =
+            await _context.Bookings
+                .Include(b => b.Equipment)
+                .FirstOrDefaultAsync(b =>
+                    b.BookingId == id &&
+                    b.Equipment != null &&
+                    b.Equipment.OwnerId == userId);
+
+        if (booking == null)
+        {
+            TempData["Error"] =
+                "Booking request was not found.";
+
+            return RedirectToAction(
+                nameof(OwnerRequests));
+        }
+
+        if (booking.Status != BookingStatus.Pending)
+        {
+            TempData["Error"] =
+                "Only pending bookings can be approved.";
+
+            return RedirectToAction(
+                nameof(OwnerRequests));
+        }
+
+        booking.Status =
+            BookingStatus.Approved;
+
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] =
+            "Booking request approved.";
+
+        return RedirectToAction(
+            nameof(OwnerRequests));
+    }
+
+    // POST: /Bookings/Reject/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Reject(int id)
+    {
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+        if (userId == null)
+        {
+            return Challenge();
+        }
+
+        var booking =
+            await _context.Bookings
+                .Include(b => b.Equipment)
+                .FirstOrDefaultAsync(b =>
+                    b.BookingId == id &&
+                    b.Equipment != null &&
+                    b.Equipment.OwnerId == userId);
+
+        if (booking == null)
+        {
+            TempData["Error"] =
+                "Booking request was not found.";
+
+            return RedirectToAction(
+                nameof(OwnerRequests));
+        }
+
+        if (booking.Status != BookingStatus.Pending)
+        {
+            TempData["Error"] =
+                "Only pending bookings can be rejected.";
+
+            return RedirectToAction(
+                nameof(OwnerRequests));
+        }
+
+        booking.Status =
+            BookingStatus.Rejected;
+
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] =
+            "Booking request rejected.";
+
+        return RedirectToAction(
+            nameof(OwnerRequests));
+    }
+
+    // GET: /Bookings/OwnerRequests
+    public async Task<IActionResult> OwnerRequests()
+    {
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+        if (userId == null)
+        {
+            return Challenge();
+        }
+
+        var requests = await (
+            from booking in _context.Bookings
+
+            join equipment in _context.Equipment
+                on booking.EquipmentId
+                equals equipment.EquipmentId
+
+            join renter in _context.Users
+                on booking.RenterId
+                equals renter.Id
+
+            where equipment.OwnerId == userId
+
+            orderby booking.CreatedAt descending
+
+            select new OwnerBookingRequestViewModel
+            {
+                BookingId = booking.BookingId,
+
+                EquipmentId =
+                    equipment.EquipmentId,
+
+                EquipmentName =
+                    equipment.Name,
+
+                RenterEmail =
+                    renter.Email ?? "Unknown user",
+
+                StartDate =
+                    booking.StartDate,
+
+                EndDate =
+                    booking.EndDate,
+
+                TotalPrice =
+                    booking.TotalPrice,
+
+                Status =
+                    booking.Status,
+
+                CreatedAt =
+                    booking.CreatedAt
+            }
+        ).ToListAsync();
+
+        return View(requests);
+    }
+
 
     // GET: /Bookings/Create?equipmentId=1
     public async Task<IActionResult> Create(

@@ -1,0 +1,306 @@
+@model IEnumerable<Toolio.Web.ViewModels.OwnerBookingRequestViewModel>
+
+@using Toolio.Web.Models
+
+@{
+    ViewData["Title"] = "Rental Requests";
+}
+
+<div class="container py-5">
+
+    <div class="mb-5">
+
+        <h1>Rental Requests</h1>
+
+        <p class="text-muted">
+            Manage requests from people who want
+            to rent your equipment.
+        </p>
+
+    </div>
+
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+
+    @{
+        var pendingRequests =
+            Model.Where(b =>
+                b.Status == BookingStatus.Pending)
+            .ToList();
+
+        var previousRequests =
+            Model.Where(b =>
+                b.Status != BookingStatus.Pending)
+            .ToList();
+    }
+
+
+    <div class="mb-5">
+
+        <h2 class="h4 mb-4">
+            Pending requests
+        </h2>
+
+
+        @if (!pendingRequests.Any())
+        {
+            <div class="
+                border
+                rounded-4
+                p-5
+                text-center">
+
+                <h3 class="h5">
+                    No pending requests
+                </h3>
+
+                <p class="text-muted mb-0">
+                    New rental requests for your
+                    equipment will appear here.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            @foreach (var request in pendingRequests)
+            {
+                <div class="
+                    border
+                    rounded-4
+                    p-4
+                    mb-3">
+
+                    <div class="
+                        row
+                        align-items-center
+                        g-4">
+
+                        <div class="col-lg-6">
+
+                            <span class="
+                                badge
+                                text-bg-warning
+                                mb-2">
+                                Pending
+                            </span>
+
+                            <h3 class="h5">
+                                @request.EquipmentName
+                            </h3>
+
+                            <p class="text-muted mb-1">
+                                Requested by
+                                @request.RenterEmail
+                            </p>
+
+                            <p class="mb-0">
+
+                                @request.StartDate.ToString(
+                                    "dd MMM yyyy")
+
+                                →
+
+                                @request.EndDate.ToString(
+                                    "dd MMM yyyy")
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="col-lg-3">
+
+                            <p class="text-muted mb-1">
+                                Rental total
+                            </p>
+
+                            <strong class="fs-5">
+                                @request.TotalPrice.ToString("C")
+                            </strong>
+
+                        </div>
+
+
+                        <div class="
+                            col-lg-3
+                            text-lg-end">
+
+                            <div class="
+                                d-flex
+                                gap-2
+                                justify-content-lg-end">
+
+                                <form asp-action="Approve"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@request.BookingId" />
+
+                                    <button type="submit"
+                                            class="btn btn-dark">
+                                        Approve
+                                    </button>
+
+                                </form>
+
+
+                                <form asp-action="Reject"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@request.BookingId" />
+
+                                    <button type="submit"
+                                            class="
+                                                btn
+                                                btn-outline-danger">
+                                        Reject
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+
+    <div>
+
+        <h2 class="h4 mb-4">
+            Request history
+        </h2>
+
+
+        @if (!previousRequests.Any())
+        {
+            <p class="text-muted">
+                No previous requests yet.
+            </p>
+        }
+        else
+        {
+            @foreach (var request in previousRequests)
+            {
+                <div class="
+                    border
+                    rounded-4
+                    p-4
+                    mb-3">
+
+                    <div class="
+                        d-flex
+                        justify-content-between
+                        flex-wrap
+                        gap-3">
+
+                        <div>
+
+                            <h3 class="h5">
+                                @request.EquipmentName
+                            </h3>
+
+                            <p class="text-muted mb-1">
+                                @request.RenterEmail
+                            </p>
+
+                            <p class="mb-0">
+
+                                @request.StartDate.ToString(
+                                    "dd MMM yyyy")
+
+                                →
+
+                                @request.EndDate.ToString(
+                                    "dd MMM yyyy")
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="text-end">
+
+                            @if (
+                                request.Status ==
+                                BookingStatus.Approved)
+                            {
+                                <span class="
+                                    badge
+                                    text-bg-success">
+                                    Approved
+                                </span>
+                            }
+                            else if (
+                                request.Status ==
+                                BookingStatus.Rejected)
+                            {
+                                <span class="
+                                    badge
+                                    text-bg-danger">
+                                    Rejected
+                                </span>
+                            }
+                            else if (
+                                request.Status ==
+                                BookingStatus.Completed)
+                            {
+                                <span class="
+                                    badge
+                                    text-bg-primary">
+                                    Completed
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="
+                                    badge
+                                    text-bg-secondary">
+                                    @request.Status
+                                </span>
+                            }
+
+
+                            <div class="mt-2">
+
+                                <strong>
+                                    @request.TotalPrice.ToString("C")
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+</div>
