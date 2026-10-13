@@ -1,12 +1,11 @@
-using System.Security.Claims;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
+using System.Security.Claims;
 using Toolio.Web.Data;
 using Toolio.Web.Models;
+using Toolio.Web.Services;
 using Toolio.Web.ViewModels;
 
 namespace Toolio.Web.Controllers;
@@ -16,9 +15,12 @@ public class EquipmentController : Controller
 {
     private readonly ApplicationDbContext _context;
 
-    public EquipmentController(ApplicationDbContext context)
+    private readonly IEquipmentService _equipmentService;
+
+    public EquipmentController(ApplicationDbContext context, IEquipmentService equipmentService)
     {
         _context = context;
+        _equipmentService = equipmentService;
     }
 
 
@@ -34,69 +36,18 @@ public class EquipmentController : Controller
         string availability = "available",
         string sort = "newest")
     {
-        var query = _context.Equipment
-            .Include(e => e.Category)
-            .AsNoTracking()
-            .AsQueryable();
-
-
-        // Search by equipment name, description or category
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            string searchTerm = search.Trim();
-
-            query = query.Where(e =>
-                e.Name.Contains(searchTerm) ||
-                e.Description.Contains(searchTerm) ||
-                (
-                    e.Category != null &&
-                    e.Category.Name.Contains(searchTerm)
-                ));
-        }
-
-
-        // Filter by category
-        if (categoryId.HasValue)
-        {
-            query = query.Where(e =>
-                e.CategoryId == categoryId.Value);
-        }
-
-
-        // Filter by availability
-        if (availability != "all")
-        {
-            query = query.Where(e =>
-                e.IsAvailable);
-        }
-
-
-        // Sort results
-        query = sort switch
-        {
-            "price-low" =>
-                query.OrderBy(e =>
-                    e.PricePerDay),
-
-            "price-high" =>
-                query.OrderByDescending(e =>
-                    e.PricePerDay),
-
-            "name" =>
-                query.OrderBy(e =>
-                    e.Name),
-
-            _ =>
-                query.OrderByDescending(e =>
-                    e.CreatedAt)
-        };
+        var equipment =
+            await _equipmentService.SearchEquipmentAsync(
+            search,
+            categoryId,
+            availability,
+            sort);
 
 
         // Create ViewModel for Browse page
         var model = new EquipmentBrowseViewModel
         {
-            Equipment =
-                await query.ToListAsync(),
+            Equipment = equipment,
 
             Categories =
                 await _context.Categories

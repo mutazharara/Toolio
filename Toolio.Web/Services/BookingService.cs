@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Toolio.Web.Data;
 using Toolio.Web.Models;
+using Toolio.Web.Services.Pricing;
 
 namespace Toolio.Web.Services;
 
@@ -36,13 +37,32 @@ public class BookingService : IBookingService
     }
 
     public decimal CalculateTotalPrice(
-        decimal pricePerDay,
-        DateTime startDate,
-        DateTime endDate)
+    decimal pricePerDay,
+    DateTime startDate,
+    DateTime endDate)
     {
         int numberOfDays =
             (endDate.Date - startDate.Date).Days + 1;
 
-        return pricePerDay * numberOfDays;
+
+        PricingStrategy pricingStrategy;
+
+
+        if (numberOfDays >= 7)
+        {
+            pricingStrategy =
+                new WeeklyDiscountPricingStrategy();
+        }
+        else
+        {
+            pricingStrategy =
+                new StandardPricingStrategy();
+        }
+
+
+        return pricingStrategy.CalculatePrice(
+            pricePerDay,
+            numberOfDays);
     }
+
 }
