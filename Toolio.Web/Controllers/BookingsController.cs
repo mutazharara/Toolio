@@ -94,6 +94,57 @@ public class BookingsController : Controller
             nameof(OwnerRequests));
     }
 
+    // POST: /Bookings/Complete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Complete(int id)
+    {
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+        if (userId == null)
+        {
+            return Challenge();
+        }
+
+        var booking = await _context.Bookings
+            .Include(b => b.Equipment)
+            .FirstOrDefaultAsync(b =>
+                b.BookingId == id &&
+                b.Equipment != null &&
+                b.Equipment.OwnerId == userId);
+
+        if (booking == null)
+        {
+            TempData["Error"] =
+                "Booking could not be found.";
+
+            return RedirectToAction(
+                nameof(OwnerRequests));
+        }
+
+        if (booking.Status != BookingStatus.Approved)
+        {
+            TempData["Error"] =
+                "Only approved bookings can be completed.";
+
+            return RedirectToAction(
+                nameof(OwnerRequests));
+        }
+
+        booking.Status =
+            BookingStatus.Completed;
+
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] =
+            "Rental marked as completed.";
+
+        return RedirectToAction(
+            nameof(OwnerRequests));
+    }
+
     // POST: /Bookings/Reject/5
     [HttpPost]
     [ValidateAntiForgeryToken]

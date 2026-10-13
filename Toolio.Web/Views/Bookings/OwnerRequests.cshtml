@@ -4,22 +4,31 @@
 
 @{
     ViewData["Title"] = "Rental Requests";
+
+    var pendingRequests = Model
+        .Where(b => b.Status == BookingStatus.Pending)
+        .ToList();
+
+    var previousRequests = Model
+        .Where(b => b.Status != BookingStatus.Pending)
+        .ToList();
 }
 
 <div class="container py-5">
 
+    <!-- Page heading -->
     <div class="mb-5">
 
         <h1>Rental Requests</h1>
 
         <p class="text-muted">
-            Manage requests from people who want
-            to rent your equipment.
+            Manage requests from people who want to rent your equipment.
         </p>
 
     </div>
 
 
+    <!-- Success Message -->
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success">
@@ -28,6 +37,7 @@
     }
 
 
+    <!-- Error Message -->
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger">
@@ -36,18 +46,9 @@
     }
 
 
-    @{
-        var pendingRequests =
-            Model.Where(b =>
-                b.Status == BookingStatus.Pending)
-            .ToList();
-
-        var previousRequests =
-            Model.Where(b =>
-                b.Status != BookingStatus.Pending)
-            .ToList();
-    }
-
+    <!-- ===================================== -->
+    <!-- PENDING REQUESTS -->
+    <!-- ===================================== -->
 
     <div class="mb-5">
 
@@ -69,8 +70,7 @@
                 </h3>
 
                 <p class="text-muted mb-0">
-                    New rental requests for your
-                    equipment will appear here.
+                    New rental requests for your equipment will appear here.
                 </p>
 
             </div>
@@ -90,6 +90,7 @@
                         align-items-center
                         g-4">
 
+                        <!-- Request info -->
                         <div class="col-lg-6">
 
                             <span class="
@@ -104,25 +105,23 @@
                             </h3>
 
                             <p class="text-muted mb-1">
-                                Requested by
-                                @request.RenterEmail
+                                Requested by @request.RenterEmail
                             </p>
 
                             <p class="mb-0">
 
-                                @request.StartDate.ToString(
-                                    "dd MMM yyyy")
+                                @request.StartDate.ToString("dd MMM yyyy")
 
                                 →
 
-                                @request.EndDate.ToString(
-                                    "dd MMM yyyy")
+                                @request.EndDate.ToString("dd MMM yyyy")
 
                             </p>
 
                         </div>
 
 
+                        <!-- Total -->
                         <div class="col-lg-3">
 
                             <p class="text-muted mb-1">
@@ -136,6 +135,7 @@
                         </div>
 
 
+                        <!-- Approve / Reject -->
                         <div class="
                             col-lg-3
                             text-lg-end">
@@ -154,7 +154,9 @@
 
                                     <button type="submit"
                                             class="btn btn-dark">
+
                                         Approve
+
                                     </button>
 
                                 </form>
@@ -168,10 +170,10 @@
                                            value="@request.BookingId" />
 
                                     <button type="submit"
-                                            class="
-                                                btn
-                                                btn-outline-danger">
+                                            class="btn btn-outline-danger">
+
                                         Reject
+
                                     </button>
 
                                 </form>
@@ -189,6 +191,10 @@
     </div>
 
 
+    <!-- ===================================== -->
+    <!-- REQUEST HISTORY -->
+    <!-- ===================================== -->
+
     <div>
 
         <h2 class="h4 mb-4">
@@ -198,9 +204,16 @@
 
         @if (!previousRequests.Any())
         {
-            <p class="text-muted">
-                No previous requests yet.
-            </p>
+            <div class="
+                border
+                rounded-4
+                p-4">
+
+                <p class="text-muted mb-0">
+                    No previous requests yet.
+                </p>
+
+            </div>
         }
         else
         {
@@ -215,9 +228,11 @@
                     <div class="
                         d-flex
                         justify-content-between
+                        align-items-start
                         flex-wrap
                         gap-3">
 
+                        <!-- Booking information -->
                         <div>
 
                             <h3 class="h5">
@@ -225,54 +240,64 @@
                             </h3>
 
                             <p class="text-muted mb-1">
-                                @request.RenterEmail
+                                Renter: @request.RenterEmail
                             </p>
 
                             <p class="mb-0">
 
-                                @request.StartDate.ToString(
-                                    "dd MMM yyyy")
+                                @request.StartDate.ToString("dd MMM yyyy")
 
                                 →
 
-                                @request.EndDate.ToString(
-                                    "dd MMM yyyy")
+                                @request.EndDate.ToString("dd MMM yyyy")
 
                             </p>
 
                         </div>
 
 
+                        <!-- Status / Price / Complete -->
                         <div class="text-end">
 
-                            @if (
-                                request.Status ==
-                                BookingStatus.Approved)
+                            <!-- Status -->
+                            @if (request.Status == BookingStatus.Approved)
                             {
                                 <span class="
                                     badge
                                     text-bg-success">
+
                                     Approved
+
                                 </span>
                             }
-                            else if (
-                                request.Status ==
-                                BookingStatus.Rejected)
+                            else if (request.Status == BookingStatus.Rejected)
                             {
                                 <span class="
                                     badge
                                     text-bg-danger">
+
                                     Rejected
+
                                 </span>
                             }
-                            else if (
-                                request.Status ==
-                                BookingStatus.Completed)
+                            else if (request.Status == BookingStatus.Completed)
                             {
                                 <span class="
                                     badge
                                     text-bg-primary">
+
                                     Completed
+
+                                </span>
+                            }
+                            else if (request.Status == BookingStatus.Cancelled)
+                            {
+                                <span class="
+                                    badge
+                                    text-bg-secondary">
+
+                                    Cancelled
+
                                 </span>
                             }
                             else
@@ -280,11 +305,14 @@
                                 <span class="
                                     badge
                                     text-bg-secondary">
+
                                     @request.Status
+
                                 </span>
                             }
 
 
+                            <!-- Price -->
                             <div class="mt-2">
 
                                 <strong>
@@ -292,6 +320,28 @@
                                 </strong>
 
                             </div>
+
+
+                            <!-- Mark Completed -->
+                            @if (request.Status == BookingStatus.Approved)
+                            {
+                                <form asp-action="Complete"
+                                      method="post"
+                                      class="mt-3">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@request.BookingId" />
+
+                                    <button type="submit"
+                                            class="btn btn-outline-dark btn-sm">
+
+                                        Mark Completed
+
+                                    </button>
+
+                                </form>
+                            }
 
                         </div>
 

@@ -1,0 +1,127 @@
+@model Toolio.Web.ViewModels.ReviewCreateViewModel
+
+@{
+    ViewData["Title"] = "Leave Review";
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-6">
+
+            <h1>How was your rental?</h1>
+
+            <p class="text-muted mb-4">
+                @Model.EquipmentName
+            </p>
+
+
+            <div class="
+                border
+                rounded-4
+                p-4">
+
+                <form asp-action="Create"
+                      method="post">
+
+                    <input type="hidden"
+                           asp-for="BookingId" />
+
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3">
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <label asp-for="Rating"
+                               class="form-label">
+
+                            Rating
+
+                        </label>
+
+
+                        <select asp-for="Rating"
+                                class="form-select">
+
+                            <option value="">
+                                Select rating
+                            </option>
+
+                            <option value="5">
+                                ★★★★★ Excellent
+                            </option>
+
+                            <option value="4">
+                                ★★★★☆ Very good
+                            </option>
+
+                            <option value="3">
+                                ★★★☆☆ Good
+                            </option>
+
+                            <option value="2">
+                                ★★☆☆☆ Fair
+                            </option>
+
+                            <option value="1">
+                                ★☆☆☆☆ Poor
+                            </option>
+
+                        </select>
+
+
+                        <span asp-validation-for="Rating"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <label asp-for="Comment"
+                               class="form-label">
+
+                            Review
+
+                        </label>
+
+
+                        <textarea asp-for="Comment"
+                                  rows="5"
+                                  class="form-control"
+                                  placeholder="Tell others about your experience with this equipment.">
+                        </textarea>
+
+
+                        <span asp-validation-for="Comment"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <button type="submit"
+                            class="btn btn-dark btn-lg w-100">
+
+                        Submit Review
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

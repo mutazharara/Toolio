@@ -1,8 +1,10 @@
 using System.Security.Claims;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using Toolio.Web.Data;
 using Toolio.Web.Models;
 using Toolio.Web.ViewModels;
@@ -19,7 +21,12 @@ public class EquipmentController : Controller
         _context = context;
     }
 
+
+    // =========================================================
+    // BROWSE EQUIPMENT
     // GET: /Equipment/Browse
+    // =========================================================
+
     [AllowAnonymous]
     public async Task<IActionResult> Browse(
         string? search,
@@ -32,7 +39,8 @@ public class EquipmentController : Controller
             .AsNoTracking()
             .AsQueryable();
 
-        // Search
+
+        // Search by equipment name, description or category
         if (!string.IsNullOrWhiteSpace(search))
         {
             string searchTerm = search.Trim();
@@ -40,48 +48,61 @@ public class EquipmentController : Controller
             query = query.Where(e =>
                 e.Name.Contains(searchTerm) ||
                 e.Description.Contains(searchTerm) ||
-                (e.Category != null &&
-                e.Category.Name.Contains(searchTerm)));
+                (
+                    e.Category != null &&
+                    e.Category.Name.Contains(searchTerm)
+                ));
         }
 
-        // Category filter
+
+        // Filter by category
         if (categoryId.HasValue)
         {
             query = query.Where(e =>
                 e.CategoryId == categoryId.Value);
         }
 
-        // Availability filter
+
+        // Filter by availability
         if (availability != "all")
         {
             query = query.Where(e =>
                 e.IsAvailable);
         }
 
-        // Sorting
+
+        // Sort results
         query = sort switch
         {
             "price-low" =>
-                query.OrderBy(e => e.PricePerDay),
+                query.OrderBy(e =>
+                    e.PricePerDay),
 
             "price-high" =>
-                query.OrderByDescending(e => e.PricePerDay),
+                query.OrderByDescending(e =>
+                    e.PricePerDay),
 
             "name" =>
-                query.OrderBy(e => e.Name),
+                query.OrderBy(e =>
+                    e.Name),
 
             _ =>
-                query.OrderByDescending(e => e.CreatedAt)
+                query.OrderByDescending(e =>
+                    e.CreatedAt)
         };
 
+
+        // Create ViewModel for Browse page
         var model = new EquipmentBrowseViewModel
         {
-            Equipment = await query.ToListAsync(),
+            Equipment =
+                await query.ToListAsync(),
 
-            Categories = await _context.Categories
-                .AsNoTracking()
-                .OrderBy(c => c.Name)
-                .ToListAsync(),
+            Categories =
+                await _context.Categories
+                    .AsNoTracking()
+                    .OrderBy(c => c.Name)
+                    .ToListAsync(),
 
             SearchTerm = search,
 
@@ -92,49 +113,115 @@ public class EquipmentController : Controller
             Sort = sort
         };
 
+
         return View(model);
     }
 
+
+    // =========================================================
+    // EQUIPMENT DETAILS
     // GET: /Equipment/Details/5
+    // =========================================================
+
     [AllowAnonymous]
     public async Task<IActionResult> Details(int id)
     {
-        var equipment = await _context.Equipment
-            .Include(e => e.Category)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(e =>
-                e.EquipmentId == id);
+        var equipment =
+            await _context.Equipment
+                .Include(e => e.Category)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e =>
+                    e.EquipmentId == id);
+
 
         if (equipment == null)
         {
             return NotFound();
         }
 
-        return View(equipment);
+
+        // Get reviews for this equipment
+        var reviews =
+            await _context.Reviews
+                .Where(r =>
+                    r.EquipmentId == id)
+                .OrderByDescending(r =>
+                    r.CreatedAt)
+                .AsNoTracking()
+                .ToListAsync();
+
+
+        // Calculate average rating
+        double averageRating = 0;
+
+        if (reviews.Any())
+        {
+            averageRating =
+                reviews.Average(r =>
+                    r.Rating);
+        }
+
+
+        // Prepare data for Details page
+        var model =
+            new EquipmentDetailsViewModel
+            {
+                Equipment =
+                    equipment,
+
+                Reviews =
+                    reviews,
+
+                AverageRating =
+                    averageRating,
+
+                ReviewCount =
+                    reviews.Count
+            };
+
+
+        return View(model);
     }
 
 
+    // =========================================================
+    // MY LISTINGS
     // GET: /Equipment
-    // Shows only equipment owned by the logged-in user
+    // =========================================================
+
     public async Task<IActionResult> Index()
     {
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
 
         if (userId == null)
         {
             return Challenge();
         }
 
-        var equipment = await _context.Equipment
-            .Include(e => e.Category)
-            .Where(e => e.OwnerId == userId)
-            .OrderByDescending(e => e.CreatedAt)
-            .ToListAsync();
+
+        // Only show equipment owned by logged-in user
+        var equipment =
+            await _context.Equipment
+                .Include(e => e.Category)
+                .Where(e =>
+                    e.OwnerId == userId)
+                .OrderByDescending(e =>
+                    e.CreatedAt)
+                .ToListAsync();
+
 
         return View(equipment);
     }
 
+
+    // =========================================================
+    // CREATE EQUIPMENT
     // GET: /Equipment/Create
+    // =========================================================
+
     public async Task<IActionResult> Create()
     {
         await LoadCategories();
@@ -142,164 +229,353 @@ public class EquipmentController : Controller
         return View(new Equipment());
     }
 
+
+    // =========================================================
+    // CREATE EQUIPMENT
     // POST: /Equipment/Create
+    // =========================================================
+
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Equipment equipment)
+    public async Task<IActionResult> Create(
+        Equipment equipment)
     {
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
 
         if (userId == null)
         {
             return Challenge();
         }
 
-        // Owner is always taken from the logged-in account
+
+        // Owner is always taken from logged-in account
+        // Never trust OwnerId sent from browser
         equipment.OwnerId = userId;
-        equipment.CreatedAt = DateTime.UtcNow;
+
+        equipment.CreatedAt =
+            DateTime.UtcNow;
+
+
+        // OwnerId is assigned by the server,
+        // so remove any client-side validation issue
+        ModelState.Remove(
+            nameof(Equipment.OwnerId));
+
 
         if (!ModelState.IsValid)
         {
-            await LoadCategories(equipment.CategoryId);
+            await LoadCategories(
+                equipment.CategoryId);
 
             return View(equipment);
         }
 
-        _context.Equipment.Add(equipment);
+
+        _context.Equipment.Add(
+            equipment);
+
 
         await _context.SaveChangesAsync();
 
-        TempData["Success"] = "Equipment listing created successfully.";
 
-        return RedirectToAction(nameof(Index));
+        TempData["Success"] =
+            "Equipment listing created successfully.";
+
+
+        return RedirectToAction(
+            nameof(Index));
     }
 
+
+    // =========================================================
+    // EDIT EQUIPMENT
     // GET: /Equipment/Edit/5
-    public async Task<IActionResult> Edit(int? id)
+    // =========================================================
+
+    public async Task<IActionResult> Edit(
+        int? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var equipment = await _context.Equipment
-            .FirstOrDefaultAsync(e =>
-                e.EquipmentId == id &&
-                e.OwnerId == userId);
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+
+        if (userId == null)
+        {
+            return Challenge();
+        }
+
+
+        // User can only edit their own equipment
+        var equipment =
+            await _context.Equipment
+                .FirstOrDefaultAsync(e =>
+                    e.EquipmentId == id &&
+                    e.OwnerId == userId);
+
 
         if (equipment == null)
         {
-            return NotFound();
+            TempData["Error"] =
+                "You do not have permission to edit this equipment.";
+
+            return RedirectToAction(
+                nameof(Index));
         }
 
-        await LoadCategories(equipment.CategoryId);
+
+        await LoadCategories(
+            equipment.CategoryId);
+
 
         return View(equipment);
     }
 
+
+    // =========================================================
+    // EDIT EQUIPMENT
     // POST: /Equipment/Edit/5
+    // =========================================================
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
         int id,
         Equipment model)
     {
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
 
-        var equipment = await _context.Equipment
-            .FirstOrDefaultAsync(e =>
-                e.EquipmentId == id &&
-                e.OwnerId == userId);
+
+        if (userId == null)
+        {
+            return Challenge();
+        }
+
+
+        // Load the real record from database
+        // and confirm ownership
+        var equipment =
+            await _context.Equipment
+                .FirstOrDefaultAsync(e =>
+                    e.EquipmentId == id &&
+                    e.OwnerId == userId);
+
 
         if (equipment == null)
         {
-            return NotFound();
+            TempData["Error"] =
+                "You do not have permission to edit this equipment.";
+
+            return RedirectToAction(
+                nameof(Index));
         }
+
+
+        // OwnerId is controlled by the server
+        ModelState.Remove(
+            nameof(Equipment.OwnerId));
+
 
         if (!ModelState.IsValid)
         {
-            await LoadCategories(model.CategoryId);
+            await LoadCategories(
+                model.CategoryId);
 
             return View(model);
         }
 
-        equipment.Name = model.Name;
-        equipment.Description = model.Description;
-        equipment.PricePerDay = model.PricePerDay;
-        equipment.CategoryId = model.CategoryId;
-        equipment.IsAvailable = model.IsAvailable;
-        equipment.ImageUrl = model.ImageUrl;
+
+        // Only update fields the owner is allowed to change
+        equipment.Name =
+            model.Name;
+
+        equipment.Description =
+            model.Description;
+
+        equipment.PricePerDay =
+            model.PricePerDay;
+
+        equipment.CategoryId =
+            model.CategoryId;
+
+        equipment.IsAvailable =
+            model.IsAvailable;
+
+        equipment.ImageUrl =
+            model.ImageUrl;
+
 
         await _context.SaveChangesAsync();
 
-        TempData["Success"] = "Equipment listing updated successfully.";
 
-        return RedirectToAction(nameof(Index));
+        TempData["Success"] =
+            "Equipment listing updated successfully.";
+
+
+        return RedirectToAction(
+            nameof(Index));
     }
 
+
+    // =========================================================
+    // DELETE EQUIPMENT
     // GET: /Equipment/Delete/5
-    public async Task<IActionResult> Delete(int? id)
+    // =========================================================
+
+    public async Task<IActionResult> Delete(
+        int? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var equipment = await _context.Equipment
-            .Include(e => e.Category)
-            .FirstOrDefaultAsync(e =>
-                e.EquipmentId == id &&
-                e.OwnerId == userId);
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+
+        if (userId == null)
+        {
+            return Challenge();
+        }
+
+
+        // Only owner can access delete page
+        var equipment =
+            await _context.Equipment
+                .Include(e => e.Category)
+                .FirstOrDefaultAsync(e =>
+                    e.EquipmentId == id &&
+                    e.OwnerId == userId);
+
 
         if (equipment == null)
         {
-            return NotFound();
+            TempData["Error"] =
+                "You do not have permission to delete this equipment.";
+
+            return RedirectToAction(
+                nameof(Index));
         }
+
 
         return View(equipment);
     }
 
+
+    // =========================================================
+    // DELETE EQUIPMENT
     // POST: /Equipment/Delete/5
+    // =========================================================
+
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    public async Task<IActionResult> DeleteConfirmed(
+        int id)
     {
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId =
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
 
-        var equipment = await _context.Equipment
-            .FirstOrDefaultAsync(e =>
-                e.EquipmentId == id &&
-                e.OwnerId == userId);
+
+        if (userId == null)
+        {
+            return Challenge();
+        }
+
+
+        // Load equipment plus related bookings/reviews
+        var equipment =
+            await _context.Equipment
+                .Include(e => e.Bookings)
+                .Include(e => e.Reviews)
+                .FirstOrDefaultAsync(e =>
+                    e.EquipmentId == id &&
+                    e.OwnerId == userId);
+
 
         if (equipment == null)
         {
-            return NotFound();
+            TempData["Error"] =
+                "You do not have permission to delete this equipment.";
+
+            return RedirectToAction(
+                nameof(Index));
         }
 
-        _context.Equipment.Remove(equipment);
+
+        // Do not delete equipment with rental history
+        if (equipment.Bookings.Any())
+        {
+            TempData["Error"] =
+                "You cannot delete equipment that has rental bookings.";
+
+            return RedirectToAction(
+                nameof(Index));
+        }
+
+
+        // Do not delete equipment with reviews
+        if (equipment.Reviews.Any())
+        {
+            TempData["Error"] =
+                "You cannot delete equipment that has reviews.";
+
+            return RedirectToAction(
+                nameof(Index));
+        }
+
+
+        _context.Equipment.Remove(
+            equipment);
+
 
         await _context.SaveChangesAsync();
 
-        TempData["Success"] = "Equipment listing deleted.";
 
-        return RedirectToAction(nameof(Index));
+        TempData["Success"] =
+            "Equipment listing deleted successfully.";
+
+
+        return RedirectToAction(
+            nameof(Index));
     }
 
-    private async Task LoadCategories(int? selectedCategoryId = null)
-    {
-        var categories = await _context.Categories
-            .OrderBy(c => c.Name)
-            .ToListAsync();
 
-        ViewBag.CategoryId = new SelectList(
-            categories,
-            "CategoryId",
-            "Name",
-            selectedCategoryId
-        );
+    // =========================================================
+    // LOAD CATEGORIES
+    // Used by Create and Edit
+    // =========================================================
+
+    private async Task LoadCategories(
+        int? selectedCategoryId = null)
+    {
+        var categories =
+            await _context.Categories
+                .OrderBy(c =>
+                    c.Name)
+                .ToListAsync();
+
+
+        ViewBag.CategoryId =
+            new SelectList(
+                categories,
+                "CategoryId",
+                "Name",
+                selectedCategoryId
+            );
     }
 }

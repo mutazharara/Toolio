@@ -37,4 +37,7 @@ public class Equipment
 
     public ICollection<Booking> Bookings { get; set; }
     = new List<Booking>();
+
+    public ICollection<Review> Reviews { get; set; }
+    = new List<Review>();
 }

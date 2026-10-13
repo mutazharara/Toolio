@@ -1,16 +1,24 @@
-@model Toolio.Web.Models.Equipment
+@model Toolio.Web.ViewModels.EquipmentDetailsViewModel
 
 @{
-    ViewData["Title"] = Model.Name;
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger mt-4">
-        @TempData["Error"]
-    </div>
+    ViewData["Title"] = Model.Equipment.Name;
 }
 
 <div class="container py-5">
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mb-4">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success mb-4">
+            @TempData["Success"]
+        </div>
+    }
 
     <!-- Back -->
     <a asp-action="Browse"
@@ -26,15 +34,15 @@
         <!-- LEFT SIDE -->
         <div class="col-lg-7">
 
-            <!-- Image -->
-            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            <!-- Equipment Image -->
+            @if (!string.IsNullOrWhiteSpace(Model.Equipment.ImageUrl))
             {
-                <img src="@Model.ImageUrl"
-                     alt="@Model.Name"
+                <img src="@Model.Equipment.ImageUrl"
+                     alt="@Model.Equipment.Name"
                      class="w-100 rounded-4"
                      style="
-                        aspect-ratio:4/3;
-                        object-fit:cover;
+                        aspect-ratio: 4 / 3;
+                        object-fit: cover;
                      " />
             }
             else
@@ -47,7 +55,7 @@
                     justify-content-center
                     text-muted"
                      style="
-                        aspect-ratio:4/3;
+                        aspect-ratio: 4 / 3;
                      ">
 
                     Equipment photo
@@ -56,19 +64,35 @@
             }
 
 
-            <!-- Main info -->
+            <!-- Main Equipment Information -->
             <div class="mt-4">
 
                 <p class="text-muted mb-2">
-                    @Model.Category?.Name
+                    @Model.Equipment.Category?.Name
                 </p>
 
-                <h1 class="display-6 fw-bold">
-                    @Model.Name
+                <h1 class="display-6 fw-bold mb-3">
+                    @Model.Equipment.Name
                 </h1>
 
 
-                @if (Model.IsAvailable)
+                @if (Model.ReviewCount > 0)
+                {
+                    <div class="mb-3">
+
+                        <span class="fw-semibold">
+                            ★ @Model.AverageRating.ToString("0.0")
+                        </span>
+
+                        <span class="text-muted">
+                            (@Model.ReviewCount review@(Model.ReviewCount == 1 ? "" : "s"))
+                        </span>
+
+                    </div>
+                }
+
+
+                @if (Model.Equipment.IsAvailable)
                 {
                     <span class="badge text-bg-success">
                         Available
@@ -85,6 +109,7 @@
                 <hr class="my-4" />
 
 
+                <!-- Description -->
                 <h2 class="h4">
                     About this equipment
                 </h2>
@@ -92,11 +117,103 @@
                 <p class="
                     fs-5
                     text-secondary"
-                   style="white-space:pre-line;">
+                   style="white-space: pre-line;">
 
-                    @Model.Description
+                    @Model.Equipment.Description
 
                 </p>
+
+
+                <!-- Reviews -->
+                <hr class="my-5" />
+
+                <div>
+
+                    <div class="
+                        d-flex
+                        align-items-center
+                        gap-3
+                        mb-4">
+
+                        <h2 class="h4 mb-0">
+                            Reviews
+                        </h2>
+
+                        @if (Model.ReviewCount > 0)
+                        {
+                            <span class="fw-semibold">
+
+                                ★ @Model.AverageRating.ToString("0.0")
+
+                                (@Model.ReviewCount)
+
+                            </span>
+                        }
+
+                    </div>
+
+
+                    @if (!Model.Reviews.Any())
+                    {
+                        <div class="
+                            border
+                            rounded-4
+                            p-4">
+
+                            <p class="text-muted mb-0">
+                                No reviews yet.
+                            </p>
+
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var review in Model.Reviews)
+                        {
+                            <div class="
+                                border-bottom
+                                pb-4
+                                mb-4">
+
+                                <!-- Stars -->
+                                <div class="mb-2">
+
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= review.Rating)
+                                        {
+                                            <span>★</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                ☆
+                                            </span>
+                                        }
+                                    }
+
+                                </div>
+
+
+                                <!-- Comment -->
+                                <p class="mb-2">
+                                    @review.Comment
+                                </p>
+
+
+                                <!-- Date -->
+                                <small class="text-muted">
+
+                                    @review.CreatedAt.ToString(
+                                        "dd MMM yyyy")
+
+                                </small>
+
+                            </div>
+                        }
+                    }
+
+                </div>
 
             </div>
 
@@ -112,14 +229,15 @@
                 p-4
                 shadow-sm"
                  style="
-                    position:sticky;
-                    top:30px;
+                    position: sticky;
+                    top: 30px;
                  ">
 
+                <!-- Price -->
                 <div class="mb-4">
 
                     <strong class="fs-2">
-                        @Model.PricePerDay.ToString("C")
+                        @Model.Equipment.PricePerDay.ToString("C")
                     </strong>
 
                     <span class="text-muted">
@@ -129,14 +247,14 @@
                 </div>
 
 
-                @if (Model.IsAvailable)
+                <!-- Availability / Booking -->
+                @if (Model.Equipment.IsAvailable)
                 {
                     <div class="
                         alert
                         alert-success">
 
-                        This equipment is available
-                        for rent.
+                        This equipment is available for rent.
 
                     </div>
 
@@ -144,9 +262,13 @@
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         <a asp-controller="Bookings"
-                        asp-action="Create"
-                        asp-route-equipmentId="@Model.EquipmentId"
-                        class="btn btn-dark btn-lg w-100">
+                           asp-action="Create"
+                           asp-route-equipmentId="@Model.Equipment.EquipmentId"
+                           class="
+                               btn
+                               btn-dark
+                               btn-lg
+                               w-100">
 
                             Request booking
 
@@ -155,27 +277,28 @@
                     else
                     {
                         <a asp-area="Identity"
-                        asp-page="/Account/Login"
-                        class="btn btn-dark btn-lg w-100">
+                           asp-page="/Account/Login"
+                           class="
+                               btn
+                               btn-dark
+                               btn-lg
+                               w-100">
 
                             Log in to request booking
 
                         </a>
                     }
-
-                    <p class="
-                        text-muted
-                        small
-                        text-center
-                        mt-2">
-
-                        Booking will be connected
-                        in the next feature.
-
-                    </p>
                 }
                 else
                 {
+                    <div class="
+                        alert
+                        alert-secondary">
+
+                        This equipment is currently unavailable.
+
+                    </div>
+
                     <button class="
                         btn
                         btn-secondary
@@ -192,6 +315,7 @@
                 <hr class="my-4" />
 
 
+                <!-- Category -->
                 <div class="
                     d-flex
                     justify-content-between">
@@ -201,12 +325,13 @@
                     </span>
 
                     <strong>
-                        @Model.Category?.Name
+                        @Model.Equipment.Category?.Name
                     </strong>
 
                 </div>
 
 
+                <!-- Listing ID -->
                 <div class="
                     d-flex
                     justify-content-between
@@ -217,8 +342,34 @@
                     </span>
 
                     <span>
-                        #@Model.EquipmentId
+                        #@Model.Equipment.EquipmentId
                     </span>
+
+                </div>
+
+
+                <!-- Review Summary -->
+                <div class="
+                    d-flex
+                    justify-content-between
+                    mt-3">
+
+                    <span class="text-muted">
+                        Rating
+                    </span>
+
+                    @if (Model.ReviewCount > 0)
+                    {
+                        <span>
+                            ★ @Model.AverageRating.ToString("0.0")
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            No reviews
+                        </span>
+                    }
 
                 </div>
 

@@ -327,6 +327,45 @@ namespace Toolio.Web.Migrations
                     b.ToTable("Equipment");
                 });
 
+            modelBuilder.Entity("Toolio.Web.Models.Review", b =>
+                {
+                    b.Property<int>("ReviewId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReviewId"));
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ReviewId");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
+                    b.HasIndex("EquipmentId");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -383,7 +422,7 @@ namespace Toolio.Web.Migrations
                     b.HasOne("Toolio.Web.Models.Equipment", "Equipment")
                         .WithMany("Bookings")
                         .HasForeignKey("EquipmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Equipment");
@@ -400,6 +439,25 @@ namespace Toolio.Web.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Toolio.Web.Models.Review", b =>
+                {
+                    b.HasOne("Toolio.Web.Models.Booking", "Booking")
+                        .WithOne()
+                        .HasForeignKey("Toolio.Web.Models.Review", "BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Toolio.Web.Models.Equipment", "Equipment")
+                        .WithMany("Reviews")
+                        .HasForeignKey("EquipmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Equipment");
+                });
+
             modelBuilder.Entity("Toolio.Web.Models.Category", b =>
                 {
                     b.Navigation("Equipment");
@@ -408,6 +466,8 @@ namespace Toolio.Web.Migrations
             modelBuilder.Entity("Toolio.Web.Models.Equipment", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }
