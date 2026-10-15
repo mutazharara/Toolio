@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolio.Web", "Toolio.Web\Toolio.Web.csproj", "{0164881A-A3BD-4818-836D-D7FC02E9377C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolio.Tests", "Toolio.Tests\Toolio.Tests.csproj", "{8CE88768-101C-484D-93FE-C89DE9CB216B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{0164881A-A3BD-4818-836D-D7FC02E9377C}.Release|x64.Build.0 = Release|Any CPU
 		{0164881A-A3BD-4818-836D-D7FC02E9377C}.Release|x86.ActiveCfg = Release|Any CPU
 		{0164881A-A3BD-4818-836D-D7FC02E9377C}.Release|x86.Build.0 = Release|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Debug|x64.Build.0 = Debug|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Debug|x86.Build.0 = Debug|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Release|x64.ActiveCfg = Release|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Release|x64.Build.0 = Release|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Release|x86.ActiveCfg = Release|Any CPU
+		{8CE88768-101C-484D-93FE-C89DE9CB216B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

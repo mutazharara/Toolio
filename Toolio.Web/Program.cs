@@ -22,6 +22,11 @@ builder.Services.AddScoped<
     IBookingService,
     BookingService>();
 
+builder.Services.AddScoped<
+    IEquipmentService,
+    EquipmentService>();
+
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
