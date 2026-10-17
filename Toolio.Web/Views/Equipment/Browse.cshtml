@@ -4,16 +4,16 @@
     ViewData["Title"] = "Browse Equipment";
 }
 
-<div class="container py-5">
+<div class="tw:mx-auto tw:max-w-6xl tw:px-4 tw:py-10">
 
     <!-- Heading -->
-    <div class="mb-5">
+    <div class="tw:mb-8">
 
-        <h1 class="display-5 fw-bold">
+        <h1 class="tw:text-3xl tw:font-bold tw:tracking-tight tw:text-slate-900">
             Find the right tool for the job
         </h1>
 
-        <p class="text-muted fs-5">
+        <p class="tw:mt-3 tw:text-lg tw:text-slate-600">
             Rent equipment from people in your community.
         </p>
 
@@ -23,35 +23,35 @@
     <!-- Search and filters -->
     <form method="get"
           asp-action="Browse"
-          class="border rounded-4 p-4 mb-5 bg-white">
+          class="tw:mb-8 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:shadow-sm">
 
-        <div class="row g-3">
+        <div class="tw:grid tw:gap-4 tw:md:grid-cols-2 tw:lg:grid-cols-12">
 
             <!-- Search -->
-            <div class="col-lg-5">
+            <div class="tw:lg:col-span-4">
 
-                <label class="form-label">
+                <label class="tw:mb-2 tw:block tw:text-sm tw:font-semibold tw:text-slate-700">
                     What do you need?
                 </label>
 
                 <input type="text"
                        name="search"
                        value="@Model.SearchTerm"
-                       class="form-control form-control-lg"
+                       class="tw:block tw:w-full tw:rounded-lg tw:border tw:border-slate-300 tw:bg-white tw:px-3 tw:py-3 tw:text-slate-900"
                        placeholder="Drill, ladder, lawn mower..." />
 
             </div>
 
 
             <!-- Category -->
-            <div class="col-lg-3">
+            <div class="tw:lg:col-span-3">
 
-                <label class="form-label">
+                <label class="tw:mb-2 tw:block tw:text-sm tw:font-semibold tw:text-slate-700">
                     Category
                 </label>
 
                 <select name="categoryId"
-                        class="form-select form-select-lg">
+                        class="tw:block tw:w-full tw:rounded-lg tw:border tw:border-slate-300 tw:bg-white tw:px-3 tw:py-3 tw:text-slate-900">
 
                     <option value="">
                         All categories
@@ -80,14 +80,14 @@
 
 
             <!-- Availability -->
-            <div class="col-lg-2">
+            <div class="tw:lg:col-span-3">
 
-                <label class="form-label">
+                <label class="tw:mb-2 tw:block tw:text-sm tw:font-semibold tw:text-slate-700">
                     Availability
                 </label>
 
                 <select name="availability"
-                        class="form-select form-select-lg">
+                        class="tw:block tw:w-full tw:rounded-lg tw:border tw:border-slate-300 tw:bg-white tw:px-3 tw:py-3 tw:text-slate-900">
 
                     @if (Model.Availability == "available")
                     {
@@ -116,10 +116,10 @@
 
 
             <!-- Search button -->
-            <div class="col-lg-2 d-flex align-items-end">
+            <div class="tw:flex tw:items-end tw:lg:col-span-2">
 
                 <button type="submit"
-                        class="btn btn-dark btn-lg w-100">
+                        class="tw:w-full tw:rounded-lg tw:border-0 tw:bg-emerald-700 tw:px-4 tw:py-3 tw:font-semibold tw:text-white tw:hover:bg-emerald-800">
                     Search
                 </button>
 
@@ -129,16 +129,16 @@
 
 
         <!-- Sorting -->
-        <div class="row mt-3">
+        <div class="tw:mt-4">
 
-            <div class="col-md-3">
+            <div class="tw:max-w-xs">
 
-                <label class="form-label">
+                <label class="tw:mb-2 tw:block tw:text-sm tw:font-semibold tw:text-slate-700">
                     Sort by
                 </label>
 
                 <select name="sort"
-                        class="form-select"
+                        class="tw:w-full tw:rounded-lg tw:border tw:border-slate-300 tw:bg-white tw:px-3 tw:py-2"
                         onchange="this.form.submit()">
 
                     <option value="newest"
@@ -171,16 +171,15 @@
 
 
     <!-- Results information -->
-    <div class="d-flex justify-content-between
-                align-items-center mb-4">
+    <div class="tw:mb-6 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
 
         <div>
 
-            <h2 class="h4 mb-1">
-                Available equipment
+            <h2 class="tw:mb-1 tw:text-xl tw:font-bold">
+                Equipment in your community
             </h2>
 
-            <p class="text-muted mb-0">
+            <p class="tw:m-0 tw:text-slate-600">
                 @Model.Equipment.Count item(s) found
             </p>
 
@@ -190,7 +189,7 @@
              || Model.CategoryId.HasValue)
         {
             <a asp-action="Browse"
-               class="btn btn-outline-secondary">
+               class="tw:rounded-lg tw:border tw:border-slate-300 tw:bg-white tw:px-4 tw:py-2 tw:text-slate-700 tw:no-underline">
                 Clear filters
             </a>
         }
@@ -201,19 +200,18 @@
     <!-- No results -->
     @if (!Model.Equipment.Any())
     {
-        <div class="border rounded-4
-                    text-center p-5">
+        <div class="tw:rounded-2xl tw:border tw:border-dashed tw:border-slate-300 tw:bg-white tw:p-10 tw:text-center">
 
-            <h3 class="h5">
+            <h3 class="tw:text-lg tw:font-semibold">
                 No equipment found
             </h3>
 
-            <p class="text-muted">
+            <p class="tw:text-slate-500">
                 Try changing your search or filters.
             </p>
 
             <a asp-action="Browse"
-               class="btn btn-dark">
+               class="tw:inline-block tw:rounded-lg tw:bg-emerald-700 tw:px-4 tw:py-2 tw:text-white tw:no-underline">
                 View all equipment
             </a>
 
@@ -222,41 +220,35 @@
     else
     {
         <!-- Equipment Cards -->
-        <div class="row g-4">
+        <div class="tw:grid tw:gap-6 tw:sm:grid-cols-2 tw:lg:grid-cols-3">
 
             @foreach (var item in Model.Equipment)
             {
-                <div class="col-sm-6 col-lg-4">
+                <div class="tw:min-w-0">
 
-                    <div class="card border-0 h-100">
+                    <div class="tw:h-full tw:overflow-hidden tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-4 tw:shadow-sm">
 
                         <!-- Equipment image -->
                         <a asp-action="Details"
                            asp-route-id="@item.EquipmentId"
-                           class="text-decoration-none">
+                           class="tw:no-underline">
 
                             @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
                             {
                                 <img src="@item.ImageUrl"
                                      alt="@item.Name"
-                                     class="w-100 rounded-4"
+                                     class="tw:w-full tw:rounded-xl"
                                      style="
-                                         aspect-ratio:4/3;
-                                         object-fit:cover;
-                                     " />
+                                aspect-ratio:4/3;
+                                object-fit:cover;
+                                " />
                             }
                             else
                             {
-                                <div class="
-                                    bg-light
-                                    rounded-4
-                                    d-flex
-                                    align-items-center
-                                    justify-content-center
-                                    text-muted"
+                                <div class="tw:flex tw:items-center tw:justify-center tw:rounded-xl tw:bg-slate-100 tw:text-slate-500"
                                      style="
-                                         aspect-ratio:4/3;
-                                     ">
+                                    aspect-ratio:4/3;
+                                    ">
 
                                     Equipment photo
 
@@ -267,20 +259,15 @@
 
 
                         <!-- Equipment details -->
-                        <div class="pt-3">
+                        <div class="tw:pt-4">
 
-                            <div class="
-                                d-flex
-                                justify-content-between
-                                gap-3">
+                            <div class="tw:flex tw:justify-between tw:gap-3">
 
                                 <a asp-action="Details"
                                    asp-route-id="@item.EquipmentId"
-                                   class="
-                                       text-decoration-none
-                                       text-dark">
+                                   class="tw:text-slate-900 tw:no-underline">
 
-                                    <h3 class="h5 mb-1">
+                                    <h3 class="tw:mb-1 tw:text-lg tw:font-bold">
                                         @item.Name
                                     </h3>
 
@@ -288,10 +275,7 @@
 
                                 @if (item.IsAvailable)
                                 {
-                                    <span class="
-                                        badge
-                                        text-bg-success
-                                        align-self-start">
+                                    <span class="tw:rounded-full tw:bg-emerald-50 tw:px-2 tw:py-1 tw:text-xs tw:font-semibold tw:text-emerald-800">
 
                                         Available
 
@@ -301,18 +285,18 @@
                             </div>
 
 
-                            <p class="text-muted mb-2">
+                            <p class="tw:mb-2 tw:text-sm tw:text-slate-500">
                                 @item.Category?.Name
                             </p>
 
 
-                            <p class="mb-3">
+                            <p class="tw:mb-4">
 
-                                <strong class="fs-5">
+                                <strong class="tw:text-xl tw:text-slate-900">
                                     @item.PricePerDay.ToString("C")
                                 </strong>
 
-                                <span class="text-muted">
+                                <span class="tw:text-slate-500">
                                     / day
                                 </span>
 
@@ -321,10 +305,7 @@
 
                             <a asp-action="Details"
                                asp-route-id="@item.EquipmentId"
-                               class="
-                                   btn
-                                   btn-outline-dark
-                                   w-100">
+                               class="tw:block tw:w-full tw:rounded-lg tw:border tw:border-emerald-700 tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-emerald-800 tw:no-underline">
 
                                 View details
 

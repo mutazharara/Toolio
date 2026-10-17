@@ -1,8 +1,18 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Community equipment rental";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="tw:mx-auto tw:max-w-6xl tw:px-4 tw:py-16 tw:md:py-24">
+    <p class="tw:mb-4 tw:text-sm tw:font-semibold tw:uppercase tw:tracking-widest tw:text-emerald-700">Your community toolbox</p>
+    <h1 class="tw:max-w-3xl tw:text-4xl tw:font-bold tw:tracking-tight tw:text-slate-900 tw:md:text-6xl">The right tool.<br />Without buying it.</h1>
+    <p class="tw:mt-6 tw:max-w-xl tw:text-lg tw:leading-relaxed tw:text-slate-600">Find equipment nearby, choose your rental dates, and send a request to the owner. Put your own unused tools to work, too.</p>
+    <div class="tw:mt-8 tw:flex tw:flex-wrap tw:gap-3">
+        <a asp-controller="Equipment" asp-action="Browse" class="tw:rounded-lg tw:bg-emerald-700 tw:px-6 tw:py-3 tw:font-semibold tw:text-white tw:no-underline">Browse equipment</a>
+        <a asp-controller="Equipment" asp-action="Create" class="tw:rounded-lg tw:border tw:border-slate-300 tw:bg-white tw:px-6 tw:py-3 tw:font-semibold tw:text-slate-800 tw:no-underline">List your equipment</a>
+    </div>
+    <div class="tw:mt-16 tw:grid tw:gap-6 tw:md:grid-cols-3">
+        @foreach (var step in new[] { ("01", "Find a tool", "Search equipment and compare daily rental prices."), ("02", "Request your dates", "Send a booking request for the dates you need."), ("03", "Rent and review", "After the owner completes your rental, share your experience.") })
+        {
+            <article class="tw:rounded-xl tw:border tw:border-slate-200 tw:bg-white tw:p-6"><p class="tw:font-bold tw:text-emerald-700">@step.Item1</p><h2 class="tw:text-lg tw:font-bold">@step.Item2</h2><p class="tw:mb-0 tw:text-slate-600">@step.Item3</p></article>
+        }
+    </div>
+</section>

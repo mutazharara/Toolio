@@ -1,0 +1,9 @@
+﻿@layer theme;
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@import "tailwindcss/utilities.css" prefix(tw) important;
+@source "../Views";
+@source "../Areas";
+
+
+body {
+}
